@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Geo-Mining Problem Forecast System — Pro</title>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/4c3d9b60c4.js" crossorigin="anonymous"></script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* ===========================
+       GLOBAL & THEME
+       =========================== */
+    :root{
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --accent:#00695c;
+      --accent-2:#ff6f00;
+      --glass: rgba(255,255,255,0.7);
+      --danger:#c62828;
+      --success:#2e7d32;
+      --shadow: 0 8px 24px rgba(12,15,20,0.06);
+      --radius:14px;
+      --maxw:1200px;
+    }
+    [data-theme="dark"]{
+      --bg:#081018;
+      --card:#07202a;
+      --muted:#98a0a6;
+      --accent:#3ec1b5;
+      --accent-2:#ffa85a;
+      --glass: rgba(255,255,255,0.03);
+      --danger:#ff8a80;
+      --success:#66ffb2;
+      --shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+      background: linear-gradient(180deg,var(--bg), #e9f2f0);
+      color:var(--muted);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.45;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+.site-logo{
+    height:42px;
+    width:42px;
+    border-radius:50%;
+    object-fit:cover;
+    border:2px solid #172239;      /* blue ring */
+    padding:3px;
+    background:white;
+}
+
+
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:600;
+    color:white;
+    font-size:18px;
+}
+
+.logo-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.logo-button:hover {
+    opacity: 0.8;
+}
+
+.logo-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-text {
+    color: white;
+    font-size: 16px;
+    line-height: 24px;
+}
+
+.logo-title {
+    color: white;
+    font-size: 20px;
+    line-height: 28px;
+    white-space: nowrap;
+}
+
+    /* Layout container */
+    .container{
+      max-width:var(--maxw);
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* ===========================
+       NAVBAR
+       =========================== */
+    header.appbar{
+      position:sticky;
+      top:0;
+      z-index:1000;
+      backdrop-filter: blur(6px);
+      background-color: #172239;
+      box-shadow:var(--shadow);
+      transition: background 0.3s;
+    }
+    [data-theme="dark"] header.appbar{
+      background: linear-gradient(90deg, rgba(0,0,0,0.55), rgba(0,0,0,0.25));
+    }
+    .appbar .container{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+    }
+    .brand .logo{
+      width:44px; height:44px;
+      border-radius:250px;
+      display:inline-grid;place-items:center;
+      background: linear-gradient(135deg,var(--accent),var(--accent-2));
+      color:white;font-weight:700;font-size:18px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+    .brand h1{ margin:0; font-size:1rem; color:var(--accent); }
+    nav.main-nav{ margin-left:auto; display:flex; gap:12px; align-items:center }
+    nav.main-nav a{
+      color:var(--muted);
+      text-decoration:none;
+      padding:8px 12px;
+      border-radius:8px;
+      font-weight:600;
+      transition: color 0.2s, background 0.2s;
+    }
+    nav.main-nav a:hover{ background:var(--glass); color:var(--accent) }
+
+    .controls{display:flex;gap:8px;align-items:center;margin-left:12px}
+    .toggle{
+      display:inline-flex; align-items:center; gap:8px; cursor:pointer;
+      padding:6px 10px; border-radius:999px; background:var(--glass);
+      color:var(--muted); font-weight:600;
+    }
+
+    /* ===========================
+       HERO
+       =========================== */
+    .hero{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns: 1fr 420px;
+      gap:24px;
+      align-items:center;
+    }
+    .hero-card{
+      background: linear-gradient(180deg, var(--card), rgba(255,255,255,0.9));
+      padding:28px;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    .hero h2{ margin:0; color:var(--accent); font-size:2rem; }
+    .hero p.lead{ color:var(--muted); margin-top:8px; font-size:1.05rem }
+    .hero .cta-row{ margin-top:18px; display:flex; gap:12px; align-items:center }
+    .btn{
+      display:inline-flex; gap:10px; align-items:center;
+      padding:10px 16px; background:var(--accent); color:white; border-radius:999px;
+      text-decoration:none; font-weight:700; box-shadow:0 8px 20px rgba(0,0,0,0.08);
+      border:none; cursor:pointer; transition: transform 0.12s ease;
+    }
+    .btn.secondary{ background:transparent; color:var(--accent); border:2px solid rgba(0,0,0,0.06) }
+    .btn:active{ transform:translateY(1px) }
+
+    /* mini stats */
+    .stats{ display:flex; gap:12px; margin-top:18px; flex-wrap:wrap }
+    .stat{ background:var(--card); border-radius:12px; padding:12px 14px; min-width:130px; box-shadow:var(--shadow) }
+    .stat strong{ display:block; color:var(--accent); font-size:1.2rem; }
+    .stat small{ color:var(--muted); font-weight:600 }
+
+    /* right panel (quick controls) */
+    .card-panel{ background:linear-gradient(180deg,var(--card),var(--glass)); padding:18px; border-radius:14px; box-shadow:var(--shadow) }
+    .panel-row{ display:flex; gap:10px; align-items:center; margin-bottom:12px }
+    .small-input{ width:100%; padding:8px 10px; border-radius:10px; border:1px solid rgba(0,0,0,0.06) }
+
+    /* ===========================
+       GRID SECTIONS
+       =========================== */
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 420px;
+      gap:22px;
+      margin-top:22px;
+    }
+
+    /* big content area */
+    .content{
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+
+    /* section card */
+    .section-card{
+      background:var(--card);
+      border-radius:12px;
+      padding:18px;
+      box-shadow:var(--shadow);
+    }
+    .section-card h3{ margin:0 0 8px 0; color:var(--accent) }
+
+    /* tool grid inside */
+    .tool-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+      gap:12px;
+    }
+
+    /* tool card */
+    .tool{
+      background: linear-gradient(180deg, rgba(255,255,255,0.86), var(--card));
+      border-radius:10px;
+      padding:12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+      transition: transform .18s ease;
+    }
+    .tool:hover{ transform: translateY(-6px) }
+    .tool h4{ margin:0 0 8px 0; color:var(--accent) }
+    .tool label{ font-weight:600; font-size:0.9rem; color:var(--muted) }
+    .tool input[type="number"], .tool input[type="text"], .tool select{
+      width:100%; padding:8px; margin-top:6px; border-radius:8px; border:1px solid rgba(0,0,0,0.06);
+    }
+    .tool .help{ font-size:0.85rem; color:var(--muted); margin-top:6px }
+
+    .tiny{ font-size:0.85rem; color:var(--muted) }
+
+    /* result badge */
+    .badge{
+      display:inline-block; padding:8px 12px; border-radius:999px; font-weight:700;
+      color:white; font-size:0.9rem;
+    }
+    .badge.safe{ background:var(--success) }
+    .badge.warn{ background:var(--accent-2); color:#222 }
+    .badge.danger{ background:var(--danger) }
+
+    /* charts */
+    .chart-card{ padding:12px; border-radius:10px; background:linear-gradient(180deg, var(--card), rgba(255,255,255,0.85)); box-shadow:var(--shadow) }
+    canvas{ max-width:100%!important; height:260px!important }
+
+    /* right sidebar */
+    aside.sidebar{
+      display:flex; flex-direction:column; gap:12px;
+      position:relative;
+    }
+    .sidebar .card{ padding:14px }
+
+    /* history table */
+    .history-list{ max-height:340px; overflow:auto; display:flex; flex-direction:column; gap:8px; padding-right:6px }
+    .history-item{
+      border-radius:10px; padding:10px; display:flex; justify-content:space-between; gap:10px; align-items:center;
+      background:linear-gradient(180deg, rgba(255,255,255,0.9), var(--card)); box-shadow:0 4px 12px rgba(0,0,0,0.04);
+    }
+    .history-item small{ color:var(--muted) }
+
+    /* about & tips */
+    .tips{ display:grid; gap:8px }
+    .tip{ padding:10px; border-radius:8px; background:linear-gradient(180deg, rgba(255,255,255,0.85), #fff); box-shadow:var(--shadow) }
+
+    /* footer */
+    footer.appfoot{ margin-top:30px; padding:18px; text-align:center; color:var(--muted) }
+
+    /* responsive */
+    @media (max-width:1100px){
+      .hero, .grid{ grid-template-columns: 1fr; }
+      nav.main-nav{ display:none }
+      .controls{ margin-left:auto }
+    }
+    @media (max-width:620px){
+      .hero h2{ font-size:1.5rem }
+      .brand h1{ display:none }
+    }
+
+    /* helper classes */
+    .muted{ color:var(--muted) }
+    .right{ text-align:right }
+    .flex{ display:flex; gap:10px; align-items:center }
+    .center{ text-align:center }
+    .pill{ padding:6px 10px; border-radius:999px; background:var(--glass); font-weight:700 }
+    .link{ color:var(--accent); cursor:pointer; text-decoration:underline }
+  </style>
+</head>
+<body data-theme="light">
+  <!-- =============== HEADER / NAV =============== -->
+  <header class="appbar" role="banner" aria-label="Top Navigation">
+    <div class="container">
+      <div class="brand" aria-hidden="true">
+       <div class="logo-content">
+                   <div class="logo">
+    <img src="images/logo.png" class="site-logo">
+   </div>
+                </div>
+        <h1 style="color: white;">Mining Forecast</h1>
+      </div>
+
+      <nav class="main-nav" role="navigation" aria-label="Main navigation">
+        <a href="#overview">Overview</a>
+        <a href="#forecast">Forecast Tools</a>
+        <a href="#charts">Charts</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </nav>
+
+      <div class="controls" aria-hidden="false">
+        <div class="toggle" id="themeToggle" role="button" tabindex="0" aria-pressed="false" title="Toggle dark mode">
+          <i class="fa-solid fa-moon"></i> <span class="tiny">Dark</span>
+        </div>
+        <div class="toggle" id="helpBtn" role="button" tabindex="0" title="Help & Info">
+          <i class="fa-solid fa-circle-info"></i> <span class="tiny">Help</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- =============== MAIN CONTAINER =============== -->
+  <main class="container" id="app" role="main">
+
+    <!-- HERO / INTRO -->
+    <section class="hero" id="overview" aria-labelledby="overview-title">
+      <div class="hero-card">
+        <h2 id="overview-title">Predict • Prevent • Protect — Geo-Mining Forecast</h2>
+        <p class="lead">A professional forecasting toolset that helps citizens, mine managers, NGOs and authorities detect environmental and health risks early — with visualizations, recommendations, and exportable reports.</p>
+
+        <div class="cta-row">
+          <button class="btn" onclick="scrollToId('forecast')"><i class="fa-solid fa-play"></i> Start Forecast</button>
+          <button class="btn secondary" onclick="scrollToId('charts')"><i class="fa-solid fa-chart-line"></i> View Charts</button>
+        </div>
+
+        <div class="stats" aria-hidden="true">
+          <div class="stat">
+            <strong id="stat-aqi">—</strong>
+            <small>Last AQI</small>
+          </div>
+          <div class="stat">
+            <strong id="stat-wqi">—</strong>
+            <small>Last WQI</small>
+          </div>
+          <div class="stat">
+            <strong id="stat-noise">—</strong>
+            <small>Last Noise (dB)</small>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT PANEL -->
+      <aside class="card-panel" aria-label="Quick actions">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <strong>Quick Scenario</strong>
+          <small class="muted">Presets</small>
+        </div>
+
+        <div class="panel-row">
+          <select id="presetSelect" class="small-input" aria-label="Load preset scenario">
+            <option value="">Choose a sample scenario</option>
+            <option value="tailingsLeak">Tailings leakage — severe water</option>
+            <option value="dustySite">Dusty blast site — high air</option>
+            <option value="noisyOps">Night operations — noisy</option>
+            <option value="healthOutbreak">Nearby outbreak — health risk</option>
+          </select>
+          <button class="btn" onclick="loadPreset()">Load</button>
+        </div>
+
+        <div style="margin-top:8px">
+          <small class="muted">Export / Reports</small>
+          <div style="display:flex; gap:8px; margin-top:8px">
+            <button class="btn" onclick="exportHistoryCSV()"><i class="fa-solid fa-file-csv"></i> CSV</button>
+            <button class="btn" onclick="generateReport()"><i class="fa-solid fa-file-lines"></i> Report</button>
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
+          <small class="muted">Live demo data</small>
+          <div style="display:flex; gap:8px; margin-top:8px">
+            <button class="btn secondary" onclick="loadSampleData()"><i class="fa-solid fa-database"></i> Load Sample</button>
+          </div>
+        </div>
+
+      </aside>
+    </section>
+
+    <!-- =============== GRID: TOOLS + SIDEBAR =============== -->
+    <section class="grid">
+
+      <!-- LEFT: Tools & charts -->
+      <div class="content">
+
+        <!-- Forecast Tools -->
+        <div class="section-card" id="forecast">
+          <h3>Forecast Tools</h3>
+          <p class="tiny">Use the calculators below. All calculations show a quick recommendation and save to history.</p>
+
+          <div class="tool-grid" aria-live="polite">
+
+            <!-- Air Pollution Tool -->
+            <div class="tool" id="tool-aqi" role="region" aria-label="Air Quality Index tool">
+              <h4><i class="fa-solid fa-wind"></i> Air Pollution — AQI</h4>
+              <label>Pollutant concentration (µg/m³)</label>
+              <input type="number" id="in-pollutant" placeholder="e.g. 180" min="0" step="0.1" />
+              <label>Standard limit / reference (µg/m³)</label>
+              <input type="number" id="in-standard" placeholder="e.g. 100" min="0.1" step="0.1" />
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <button class="btn" onclick="handleCalculateAQI()">Calculate AQI</button>
+                <button class="btn secondary" onclick="fillExampleAQI()">Example</button>
+              </div>
+              <p class="help tiny">Formula: <code>AQI = (Pollutant / Standard) × 100</code></p>
+              <div style="margin-top:10px"><span id="result-aqi" class="badge pill">No result</span></div>
+            </div>
+
+            <!-- Water Pollution Tool -->
+            <div class="tool" id="tool-wqi" role="region" aria-label="Water Quality Index tool">
+              <h4><i class="fa-solid fa-tint"></i> Water Pollution — WQI</h4>
+              <label>Quality ratings Qi (comma separated)</label>
+              <input type="text" id="in-qi" placeholder="e.g. 80,70,90" />
+              <label>Weights Wi (comma separated)</label>
+              <input type="text" id="in-wi" placeholder="e.g. 0.4,0.3,0.3" />
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <button class="btn" onclick="handleCalculateWQI()">Calculate WQI</button>
+                <button class="btn secondary" onclick="fillExampleWQI()">Example</button>
+              </div>
+              <p class="help tiny">Formula: <code>WQI = Σ(Qi × Wi) ÷ Σ(Wi)</code></p>
+              <div style="margin-top:10px"><span id="result-wqi" class="badge pill">No result</span></div>
+            </div>
+
+            <!-- Noise Tool -->
+            <div class="tool" id="tool-noise" role="region" aria-label="Noise tool">
+              <h4><i class="fa-solid fa-volume-up"></i> Noise Pollution</h4>
+              <label>Noise level (dB)</label>
+              <input type="number" id="in-noise" placeholder="e.g. 92" min="0" step="0.1" />
+              <label>Exposure duration (hours)</label>
+              <input type="number" id="in-noise-hours" placeholder="e.g. 8" min="0" step="0.1" />
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <button class="btn" onclick="handleCalculateNoise()">Check Noise</button>
+                <button class="btn secondary" onclick="fillExampleNoise()">Example</button>
+              </div>
+              <p class="help tiny">Guideline: >85 dB for 8 hrs → unsafe.</p>
+              <div style="margin-top:10px"><span id="result-noise" class="badge pill">No result</span></div>
+            </div>
+
+            <!-- Health Tool -->
+            <div class="tool" id="tool-health" role="region" aria-label="Health prevalence tool">
+              <h4><i class="fa-solid fa-heartbeat"></i> Health Risk — Prevalence</h4>
+              <label>Affected people</label>
+              <input type="number" id="in-affected" placeholder="e.g. 45" min="0" step="1" />
+              <label>Total surveyed population</label>
+              <input type="number" id="in-total" placeholder="e.g. 200" min="1" step="1" />
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <button class="btn" onclick="handleCalculateHealth()">Calculate</button>
+                <button class="btn secondary" onclick="fillExampleHealth()">Example</button>
+              </div>
+              <p class="help tiny">Formula: <code>Prevalence (%) = (Affected ÷ Total) × 100</code></p>
+              <div style="margin-top:10px"><span id="result-health" class="badge pill">No result</span></div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="section-card" id="charts">
+          <h3>Charts & Trends</h3>
+          <p class="tiny">Visualize the last measurements and trends.</p>
+          <div style="display:grid; grid-template-columns: 1fr; gap:12px; margin-top:10px">
+            <div class="chart-card">
+              <canvas id="trendChart" aria-label="Trends chart" role="img"></canvas>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px">
+              <div class="chart-card">
+                <small class="muted">AQI History</small>
+                <canvas id="aqiChart" aria-label="AQI chart" role="img"></canvas>
+              </div>
+              <div class="chart-card">
+                <small class="muted">WQI History</small>
+                <canvas id="wqiChart" aria-label="WQI chart" role="img"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recommendations / Tips Section -->
+        <div class="section-card" id="tips">
+          <h3>Recommendations & Mitigation</h3>
+          <div class="tips">
+            <div class="tip">
+              <strong>Air Quality</strong>
+              <p class="tiny">If AQI &gt; 100: issue public advisories, suspend heavy blasting during windy hours, provide N95 masks to workers, speed up dust control measures (sprinklers, dust suppressants).</p>
+            </div>
+            <div class="tip">
+              <strong>Water Safety</strong>
+              <p class="tiny">If WQI &lt; 50: consider immediate water testing, set up temporary filtration, notify authorities, restrict use of affected water for drinking or irrigation.</p>
+            </div>
+            <div class="tip">
+              <strong>Noise</strong>
+              <p class="tiny">If noise &gt; 85 dB for prolonged hours: install acoustic barriers, schedule noisy operations in daytime, provide ear protection for workers, monitor over time.</p>
+            </div>
+            <div class="tip">
+              <strong>Health</strong>
+              <p class="tiny">If disease prevalence &gt; 20%: mobilize medical screening, collaborate with local health units, investigate cause (water/air) and launch targeted interventions.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: Sidebar -->
+      <aside class="sidebar" aria-label="Sidebar with history and contact">
+
+        <!-- Live status -->
+        <div class="section-card">
+          <strong>Live Status</strong>
+          <div style="margin-top:10px; display:grid; gap:8px">
+            <div class="flex">
+              <div class="pill">AQI</div>
+              <div style="margin-left:auto"><strong id="live-aqi">—</strong></div>
+            </div>
+            <div class="flex">
+              <div class="pill">WQI</div>
+              <div style="margin-left:auto"><strong id="live-wqi">—</strong></div>
+            </div>
+            <div class="flex">
+              <div class="pill">Noise</div>
+              <div style="margin-left:auto"><strong id="live-noise">—</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- History -->
+        <div class="section-card">
+          <strong>History</strong>
+          <p class="tiny">Recent calculations (stored locally)</p>
+          <div class="history-list" id="historyList" role="list" aria-live="polite"></div>
+          <div style="display:flex; gap:8px; margin-top:10px">
+            <button class="btn" onclick="clearHistory()">Clear</button>
+            <button class="btn secondary" onclick="exportHistoryCSV()">Export CSV</button>
+          </div>
+        </div>
+
+        <!-- Contact / small form -->
+        <div class="section-card">
+          <strong>Contact (Demo)</strong>
+          <p class="tiny">Send a quick message (demo only)</p>
+          <form id="contactForm" onsubmit="handleContact(event)" aria-label="Contact form">
+            <input class="small-input" id="contactName" placeholder="Your name" required />
+            <input class="small-input" id="contactEmail" type="email" placeholder="Email" required />
+            <textarea class="small-input" id="contactMessage" rows="3" placeholder="Message" required></textarea>
+            <div style="display:flex; gap:8px">
+              <button class="btn" type="submit">Send</button>
+              <button class="btn secondary" type="button" onclick="fillContactDemo()">Fill</button>
+            </div>
+          </form>
+        </div>
+
+      </aside>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="section-card" aria-labelledby="about-title" style="margin-top:20px">
+      <h3 id="about-title">About the Project</h3>
+      <p>The <strong>Geo-Mining Problem Forecast System</strong> is a demonstration/prototype application intended to help communities, mine operators, environmental authorities and NGOs assess and forecast environmental hazards associated with mining operations. It combines simple scientific formulas and pragmatic rules to produce early warnings and remedial suggestions. Use as a decision support tool; for production you'd integrate sensors, geospatial data, and validated local standards.</p>
+
+      <h4>Target users</h4>
+      <ul>
+        <li>Mine workers & site managers</li>
+        <li>Local communities</li>
+        <li>Government & environmental agencies</li>
+        <li>NGOs and researchers</li>
+      </ul>
+
+      <h4>Formulas used</h4>
+      <ol>
+        <li><strong>AQI</strong> — <code>(Pollutant / Standard) × 100</code>. If AQI &gt; 100 consider strong public health advisories.</li>
+        <li><strong>WQI</strong> — Weighted average <code>Σ(Qi·Wi) / Σ(Wi)</code>. Values &lt; 50 considered unsafe in this demo.</li>
+        <li><strong>Noise</strong> — Compare level & exposure; guideline: 85 dB for 8 hours = unsafe.</li>
+        <li><strong>Health prevalence</strong> — <code>(Affected ÷ Total) × 100</code>. Threshold: 20% used here as a caution trigger.</li>
+      </ol>
+      <p class="tiny">Note: thresholds here are illustrative — adapt to local regulation and more advanced epidemiological models in production deployments.</p>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="section-card" style="margin-top:20px">
+      <h3>Contact / Next Steps</h3>
+      <p class="tiny">This demo includes client-side features. Next steps for a production system include: sensor integration (IoT), backend for persistent storage, geospatial mapping (leaflet/Mapbox), historical analytics, and regulatory thresholds per region.</p>
+      <div style="display:flex; gap:12px; margin-top:10px">
+        <button class="btn" onclick="downloadTemplate()">Download Project Template</button>
+        <button class="btn secondary" onclick="scrollToId('overview')">Back to Top</button>
+      </div>
+    </section>
+
+    <footer class="appfoot">
+      © 2025 Geo-Mining Forecast • Built for demonstration and educational purposes.
+    </footer>
+
+  </main>
+
+  <!-- HELP MODAL -->
+  <div id="helpModal" role="dialog" aria-modal="true" aria-hidden="true" style="position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:2000;">
+    <div style="width:92%; max-width:900px; background:var(--card); border-radius:14px; box-shadow:var(--shadow); padding:18px; max-height:84vh; overflow:auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center">
+        <h3>Help & Formulas</h3>
+        <button class="btn secondary" onclick="toggleHelp(false)">Close</button>
+      </div>
+      <hr />
+      <h4>Project Summary</h4>
+      <p>This app predicts mining-related problems using simple metrics and provides recommendations. Use it as a knowledge/UX prototype — replace thresholds and formula weights with local standards for production.</p>
+      <h4>How to use</h4>
+      <ol>
+        <li>Open Forecast Tools and enter measurements (from field sensors or lab tests).</li>
+        <li>Click Calculate — results are stored in local history and updated on charts.</li>
+        <li>Export CSV or generate a quick report for sharing.</li>
+      </ol>
+      <h4>Data privacy note</h4>
+      <p>All data is stored locally in your browser's localStorage for demo purposes. No data leaves your machine in this demo.</p>
+    </div>
+  </div>
+
+  <!-- ===========================
+       JAVASCRIPT: LOGIC & UI
+       =========================== -->
+  <script>
+    /************************************************************************
+     * App state and utilities
+     ************************************************************************/
+    const appState = {
+      history: loadHistoryFromStorage(),
+      charts: {
+        trendChart: null,
+        aqiChart: null,
+        wqiChart: null
+      }
+    };
+
+    // Helper: scroll to id
+    function scrollToId(id){
+      const el = document.getElementById(id);
+      if(el) el.scrollIntoView({behavior:"smooth", block:"center"});
+    }
+
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('click', () => toggleTheme());
+    themeToggle.addEventListener('keypress', (e) => { if(e.key==='Enter') toggleTheme(); });
+
+    function toggleTheme(forceTo){
+      const el = document.documentElement;
+      const current = el.getAttribute('data-theme') || 'light';
+      const next = (forceTo ? forceTo : (current === 'light' ? 'dark' : 'light'));
+      el.setAttribute('data-theme', next);
+      themeToggle.setAttribute('aria-pressed', next === 'dark');
+      themeToggle.querySelector('.tiny').textContent = next === 'dark' ? 'Dark' : 'Light';
+    }
+
+    // Help modal
+    const helpBtn = document.getElementById('helpBtn');
+    const helpModal = document.getElementById('helpModal');
+    helpBtn.addEventListener('click', () => toggleHelp(true));
+    helpBtn.addEventListener('keypress', (e) => { if(e.key==='Enter') toggleHelp(true); });
+
+    function toggleHelp(show){
+      helpModal.style.display = show ? 'flex' : 'none';
+      helpModal.setAttribute('aria-hidden', !show);
+    }
+
+    // Small utility to format timestamp
+    function nowISO(){ return new Date().toISOString(); }
+    function niceTime(iso){ return new Date(iso).toLocaleString(); }
+
+    /************************************************************************
+     * HISTORY STORAGE (localStorage)
+     ************************************************************************/
+    function loadHistoryFromStorage(){
+      try{
+        const raw = localStorage.getItem('geo_mining_history_v1');
+        if(!raw) return [];
+        return JSON.parse(raw);
+      }catch(e){
+        console.warn('history load error', e);
+        return [];
+      }
+    }
+
+    function saveHistoryToStorage(){
+      try{
+        localStorage.setItem('geo_mining_history_v1', JSON.stringify(appState.history));
+      }catch(e){ console.warn('save history error', e) }
+    }
+
+    function pushHistory(item){
+      appState.history.unshift(item); // newest first
+      if(appState.history.length > 200) appState.history.pop(); // cap length
+      saveHistoryToStorage();
+      renderHistory();
+      updateCharts();
+      updateLiveStats();
+    }
+
+    function clearHistory(){
+      if(!confirm('Clear all locally stored history?')) return;
+      appState.history = [];
+      saveHistoryToStorage();
+      renderHistory();
+      updateCharts();
+      updateLiveStats();
+    }
+
+    function deleteHistoryIndex(idx){
+      appState.history.splice(idx,1);
+      saveHistoryToStorage();
+      renderHistory();
+      updateCharts();
+      updateLiveStats();
+    }
+
+    /************************************************************************
+     * EXPORT CSV & REPORT
+     ************************************************************************/
+    function exportHistoryCSV(){
+      if(appState.history.length===0){ alert('No history to export.'); return; }
+      const rows = [['timestamp','type','value','unit','note']];
+      appState.history.forEach(h => rows.push([h.ts, h.type, h.value, h.unit || '', h.note || '']));
+      const csv = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'geo_mining_history.csv'; document.body.appendChild(a); a.click();
+      a.remove(); URL.revokeObjectURL(url);
+    }
+
+    function generateReport(){
+      // Create a simple HTML report and prompt download as .html (can be viewed/printed).
+      const html = buildReportHTML();
+      const blob = new Blob([html], {type: 'text/html'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `geo_mining_report_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.html`;
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    }
+
+    function buildReportHTML(){
+      // Very simple: include last 10 history entries
+      const last = appState.history.slice(0,10);
+      return `
+        <!doctype html>
+        <html><head><meta charset="utf-8"><title>Geo-Mining Report</title>
+        <style>body{font-family:Arial, sans-serif;padding:20px;color:#222}h1{color:#00695c}table{width:100%;border-collapse:collapse}td,th{padding:8px;border:1px solid #ddd}</style>
+        </head><body>
+        <h1>Geo-Mining Forecast — Quick Report</h1>
+        <p>Generated: ${niceTime(new Date().toISOString())}</p>
+        <h2>Recent measurements</h2>
+        <table><thead><tr><th>Time</th><th>Type</th><th>Value</th><th>Unit</th><th>Note</th></tr></thead><tbody>
+        ${last.map(h => `<tr><td>${niceTime(h.ts)}</td><td>${h.type}</td><td>${h.value}</td><td>${h.unit || ''}</td><td>${(h.note||'')}</td></tr>`).join('')}
+        </tbody></table>
+        <h2>Recommendations</h2>
+        <p>Please refer to the interactive web app for full recommendations and charts. This is a quick static export.</p>
+        </body></html>
+      `;
+    }
+
+    /************************************************************************
+     * CALCULATION HELPERS & THRESHOLDS
+     ************************************************************************/
+    const thresholds = {
+      aqi: 100,    // >100 = unhealthy as per our demo
+      wqi: 50,     // <50 unsafe
+      noise_db: 85, // dB
+      noise_hours: 8,
+      prevalence_pct: 20
+    };
+
+    // AQI formula
+    function computeAQI(pollutant, standard){
+      if(!isFinite(pollutant) || !isFinite(standard) || standard <= 0) return null;
+      return (pollutant / standard) * 100;
+    }
+
+    // WQI formula
+    function computeWQI(qiArr, wiArr){
+      if(!Array.isArray(qiArr) || !Array.isArray(wiArr) || qiArr.length === 0 || qiArr.length !== wiArr.length) return null;
+      const numerator = qiArr.reduce((s,v,i) => s + (v*wiArr[i]), 0);
+      const denom = wiArr.reduce((s,v) => s + v, 0);
+      if(denom === 0) return null;
+      return numerator / denom;
+    }
+
+    // Noise check
+    function computeNoiseSafety(db, hours){
+      if(!isFinite(db) || db < 0) return null;
+      // We'll treat unsafe if db > threshold OR (db >= threshold && hours >= thresholdHours)
+      const unsafe = (db > thresholds.noise_db) || (db >= thresholds.noise_db && (hours >= thresholds.noise_hours));
+      return {db, hours, unsafe};
+    }
+
+    // Health
+    function computePrevalence(affected, total){
+      if(!isFinite(affected) || !isFinite(total) || total <= 0) return null;
+      const pct = (affected/total) * 100;
+      return pct;
+    }
+
+    /************************************************************************
+     * HANDLERS FOR UI INTERACTIONS
+     ************************************************************************/
+    function handleCalculateAQI(){
+      const pollutant = parseFloat(document.getElementById('in-pollutant').value);
+      const standard = parseFloat(document.getElementById('in-standard').value);
+      const aqi = computeAQI(pollutant, standard);
+      const elBadge = document.getElementById('result-aqi');
+
+      if(aqi === null || isNaN(aqi)){ elBadge.textContent = 'Invalid input'; elBadge.className = 'badge pill danger'; return; }
+
+      const safe = aqi <= thresholds.aqi;
+      elBadge.textContent = `AQI: ${aqi.toFixed(1)} ${safe ? '— Safe' : '— High Risk'}`;
+      elBadge.className = 'badge pill ' + (safe ? 'safe' : 'danger');
+
+      // push to history
+      pushHistory({ ts: nowISO(), type:'AQI', value: aqi.toFixed(2), unit:'AQI', note: safe ? 'Normal' : 'High' });
+
+      // Update main stats
+      document.getElementById('live-aqi').textContent = aqi.toFixed(1);
+      document.getElementById('stat-aqi').textContent = aqi.toFixed(1);
+
+      // update charts
+      updateCharts();
+
+      // Show suggestion toast (small)
+      showTinyToast(safe ? 'AQI is within acceptable limits.' : 'AQI high — consider dust control & advisories.', safe ? 'success' : 'danger');
+    }
+
+    function handleCalculateWQI(){
+      const qi = parseListFloat(document.getElementById('in-qi').value);
+      const wi = parseListFloat(document.getElementById('in-wi').value);
+
+      const wqi = computeWQI(qi, wi);
+      const elBadge = document.getElementById('result-wqi');
+
+      if(wqi === null){ elBadge.textContent = 'Invalid inputs'; elBadge.className = 'badge pill danger'; return; }
+
+      const safe = wqi >= thresholds.wqi;
+      elBadge.textContent = `WQI: ${wqi.toFixed(1)} ${safe ? '— Acceptable' : '— Unsafe'}`;
+      elBadge.className = 'badge pill ' + (safe ? 'safe' : 'danger');
+
+      pushHistory({ ts: nowISO(), type:'WQI', value: wqi.toFixed(2), unit:'WQI', note: safe ? 'OK' : 'Unsafe' });
+
+      document.getElementById('live-wqi').textContent = wqi.toFixed(1);
+      document.getElementById('stat-wqi').textContent = wqi.toFixed(1);
+
+      updateCharts();
+      showTinyToast(safe ? 'WQI acceptable.' : 'WQI low — water treatment recommended.', safe ? 'success' : 'danger');
+    }
+
+    function handleCalculateNoise(){
+      const db = parseFloat(document.getElementById('in-noise').value);
+      const hours = parseFloat(document.getElementById('in-noise-hours').value) || 0;
+      const result = computeNoiseSafety(db, hours);
+      const elBadge = document.getElementById('result-noise');
+
+      if(result === null){ elBadge.textContent = 'Invalid input'; elBadge.className = 'badge pill danger'; return; }
+
+      if(result.unsafe){
+        elBadge.textContent = `Noise: ${result.db} dB for ${result.hours} hrs — Unsafe`;
+        elBadge.className = 'badge pill danger';
+      }else{
+        elBadge.textContent = `Noise: ${result.db} dB for ${result.hours} hrs — Acceptable`;
+        elBadge.className = 'badge pill safe';
+      }
+
+      pushHistory({ ts: nowISO(), type:'Noise', value: result.db.toFixed(1), unit:'dB', note: `hours:${result.hours}` });
+      document.getElementById('live-noise').textContent = `${result.db.toFixed(1)} dB`;
+      document.getElementById('stat-noise').textContent = `${result.db.toFixed(1)} dB`;
+
+      updateCharts();
+      showTinyToast(result.unsafe ? 'Noise level/time unsafe — provide ear protection & barriers.' : 'Noise within acceptable limits.', result.unsafe ? 'danger' : 'success');
+    }
+
+    function handleCalculateHealth(){
+      const affected = parseInt(document.getElementById('in-affected').value);
+      const total = parseInt(document.getElementById('in-total').value);
+      const pct = computePrevalence(affected, total);
+      const elBadge = document.getElementById('result-health');
+
+      if(pct === null){ elBadge.textContent = 'Invalid input'; elBadge.className = 'badge pill danger'; return; }
+
+      const danger = pct > thresholds.prevalence_pct;
+      elBadge.textContent = `Prevalence: ${pct.toFixed(1)}% ${danger ? '— High' : '— Controlled'}`;
+      elBadge.className = 'badge pill ' + (danger ? 'danger' : 'safe');
+
+      pushHistory({ ts: nowISO(), type:'Health', value: pct.toFixed(2), unit:'%', note: `affected:${affected}` });
+      updateCharts();
+      showTinyToast(danger ? 'High disease prevalence — consider medical response.' : 'Prevalence under control.', danger ? 'danger' : 'success');
+    }
+
+    /************************************************************************
+     * UI Helpers: parse lists and small utilities
+     ************************************************************************/
+    function parseListFloat(text){
+      if(!text) return [];
+      return text.split(',').map(s => parseFloat(s.trim())).filter(v => !isNaN(v));
+    }
+
+    // small toast
+    function showTinyToast(message, type='success'){
+      const t = document.createElement('div');
+      t.textContent = message;
+      t.style.position='fixed';
+      t.style.right='18px';
+      t.style.bottom='18px';
+      t.style.padding='12px 16px';
+      t.style.borderRadius='10px';
+      t.style.color='#07202a';
+      t.style.background = (type==='success') ? 'rgba(198,255,212,0.95)' : 'rgba(255,205,210,0.95)';
+      t.style.boxShadow = '0 8px 20px rgba(0,0,0,0.12)';
+      document.body.appendChild(t);
+      setTimeout(()=>{ t.style.transition='opacity .6s'; t.style.opacity=0; setTimeout(()=>t.remove(),650) }, 2600);
+    }
+
+    /************************************************************************
+     * HISTORY RENDERING
+     ************************************************************************/
+    function renderHistory(){
+      const container = document.getElementById('historyList');
+      container.innerHTML = '';
+      if(appState.history.length === 0){
+        container.innerHTML = `<div class="tiny muted">No history yet — run a calculation to store a record.</div>`;
+        return;
+      }
+      appState.history.forEach((h, idx) => {
+        const div = document.createElement('div');
+        div.className = 'history-item';
+        div.setAttribute('role','listitem');
+
+        const left = document.createElement('div');
+        left.innerHTML = `<strong>${h.type}</strong><div class="tiny muted">${niceTime(h.ts)}</div>`;
+
+        const mid = document.createElement('div');
+        mid.className = 'muted';
+        mid.innerHTML = `${h.value} ${h.unit || ''} <div class="tiny">${h.note || ''}</div>`;
+
+        const right = document.createElement('div');
+        right.style.display = 'flex';
+        right.style.gap = '8px';
+        right.style.alignItems = 'center';
+
+        const del = document.createElement('button');
+        del.className = 'pill';
+        del.textContent = 'Delete';
+        del.onclick = ()=>{ if(confirm('Delete this record?')) deleteHistoryIndex(idx) };
+
+        right.appendChild(del);
+
+        div.append(left, mid, right);
+        container.appendChild(div);
+      });
+    }
+
+    /************************************************************************
+     * CHARTS (using Chart.js)
+     ************************************************************************/
+    function initCharts(){
+      // trendChart shows series for AQI, WQI, Noise, Health over time
+      const ctxTrend = document.getElementById('trendChart').getContext('2d');
+      appState.charts.trendChart = new Chart(ctxTrend, {
+        type: 'line',
+        data: { labels: [], datasets: [
+          { label:'AQI', data:[], borderColor:'#ff7043', backgroundColor:'rgba(255,112,67,0.08)', tension:0.3, yAxisID:'y1' },
+          { label:'WQI', data:[], borderColor:'#42a5f5', backgroundColor:'rgba(66,165,245,0.08)', tension:0.3, yAxisID:'y2' },
+          { label:'Noise (dB)', data:[], borderColor:'#ab47bc', backgroundColor:'rgba(171,71,188,0.08)', tension:0.3, yAxisID:'y1' },
+          { label:'Health (%)', data:[], borderColor:'#66bb6a', backgroundColor:'rgba(102,187,106,0.08)', tension:0.3, yAxisID:'y2' },
+        ]},
+        options: {
+          responsive:true,
+          maintainAspectRatio:false,
+          scales: {
+            x: { display:true, title:{display:true, text:'Time'} },
+            y1: { type:'linear', position:'left', display:true, title:{display:true,text:'AQI / dB'} },
+            y2: { type:'linear', position:'right', display:true, title:{display:true,text:'WQI / %'}, grid:{drawOnChartArea:false} }
+          },
+          interaction:{mode:'index', intersect:false}
+        }
+      });
+
+      // individual small charts
+      const ctxAqi = document.getElementById('aqiChart').getContext('2d');
+      appState.charts.aqiChart = new Chart(ctxAqi, {
+        type:'bar', data:{ labels:[], datasets:[{ label:'AQI', data:[], backgroundColor:'#ff7043' }] }, options:{responsive:true, maintainAspectRatio:false}
+      });
+
+      const ctxWqi = document.getElementById('wqiChart').getContext('2d');
+      appState.charts.wqiChart = new Chart(ctxWqi, {
+        type:'bar', data:{ labels:[], datasets:[{ label:'WQI', data:[], backgroundColor:'#42a5f5' }] }, options:{responsive:true, maintainAspectRatio:false}
+      });
+
+      updateCharts();
+    }
+
+    function updateCharts(){
+      // derive last N entries
+      const last = appState.history.slice(0,50).reverse(); // oldest to newest
+      const labels = last.map(h => new Date(h.ts).toLocaleTimeString());
+
+      // helper extract
+      const series = {AQI:[], WQI:[], Noise:[], Health:[]};
+      last.forEach(h=>{
+        if(h.type === 'AQI') series.AQI.push(parseFloat(h.value));
+        else if(h.type === 'WQI') series.WQI.push(parseFloat(h.value));
+        else if(h.type === 'Noise') series.Noise.push(parseFloat(h.value));
+        else if(h.type === 'Health') series.Health.push(parseFloat(h.value));
+      });
+
+      // Trend chart dataset mapping: fill with nulls to align arrays to labels length
+      const len = labels.length;
+      const fillWithNulls = (arr) => {
+        const res = [];
+        let ai=0;
+        for(let i=0;i<len;i++){
+          // find record at same time? simpler: map sequentially; values may be missing if types absent
+          res.push(arr[ai] !== undefined ? arr[ai++] : null);
+        }
+        return res;
+      }
+
+      if(appState.charts.trendChart){
+        appState.charts.trendChart.data.labels = labels;
+        appState.charts.trendChart.data.datasets[0].data = fillWithNulls(series.AQI);
+        appState.charts.trendChart.data.datasets[1].data = fillWithNulls(series.WQI);
+        appState.charts.trendChart.data.datasets[2].data = fillWithNulls(series.Noise);
+        appState.charts.trendChart.data.datasets[3].data = fillWithNulls(series.Health);
+        appState.charts.trendChart.update();
+      }
+
+      if(appState.charts.aqiChart){
+        appState.charts.aqiChart.data.labels = labels;
+        appState.charts.aqiChart.data.datasets[0].data = fillWithNulls(series.AQI);
+        appState.charts.aqiChart.update();
+      }
+      if(appState.charts.wqiChart){
+        appState.charts.wqiChart.data.labels = labels;
+        appState.charts.wqiChart.data.datasets[0].data = fillWithNulls(series.WQI);
+        appState.charts.wqiChart.update();
+      }
+    }
+
+    /************************************************************************
+     * SAMPLE DATA, PRESETS & UTILITIES
+     ************************************************************************/
+    function fillExampleAQI(){
+      document.getElementById('in-pollutant').value = 180;
+      document.getElementById('in-standard').value = 100;
+    }
+    function fillExampleWQI(){
+      document.getElementById('in-qi').value = '40,35,50';
+      document.getElementById('in-wi').value = '0.4,0.35,0.25';
+    }
+    function fillExampleNoise(){
+      document.getElementById('in-noise').value = 92;
+      document.getElementById('in-noise-hours').value = 8;
+    }
+    function fillExampleHealth(){
+      document.getElementById('in-affected').value = 45;
+      document.getElementById('in-total').value = 200;
+    }
+
+    function loadSampleData(){
+      // push several realistic demo entries
+      const now = new Date();
+      const demo = [
+        {offset:-3600*3, type:'AQI', value:120, unit:'AQI', note:'dust spike'},
+        {offset:-3600*2.5, type:'WQI', value:48, unit:'WQI', note:'tailings leakage'},
+        {offset:-3600*2, type:'Noise', value:92, unit:'dB', note:'night blasting'},
+        {offset:-3600*1, type:'Health', value:12, unit:'%', note:'routine survey'},
+        {offset:-1800, type:'AQI', value:98, unit:'AQI', note:'after sprayers'},
+        {offset:-600, type:'WQI', value:55, unit:'WQI', note:'post-treatment'},
+        {offset:-300, type:'Noise', value:78, unit:'dB', note:'daytime ops'},
+      ];
+      demo.forEach(d=>{
+        const ts = new Date(now.getTime() + d.offset*1000).toISOString();
+        appState.history.unshift({ ts, type: d.type, value: d.value, unit: d.unit, note: d.note });
+      });
+      if(appState.history.length > 200) appState.history = appState.history.slice(0,200);
+      saveHistoryToStorage();
+      renderHistory();
+      updateCharts();
+      updateLiveStats();
+      showTinyToast('Sample data loaded', 'success');
+    }
+
+    function loadPreset(){
+      const sel = document.getElementById('presetSelect').value;
+      if(!sel) { alert('Choose a preset'); return; }
+      if(sel === 'tailingsLeak'){
+        document.getElementById('in-qi').value = '20,30,25,40';
+        document.getElementById('in-wi').value = '0.3,0.25,0.2,0.25';
+        scrollToId('tool-wqi');
+      } else if(sel === 'dustySite'){
+        document.getElementById('in-pollutant').value = 220;
+        document.getElementById('in-standard').value = 100;
+        scrollToId('tool-aqi');
+      } else if(sel === 'noisyOps'){
+        document.getElementById('in-noise').value = 95;
+        document.getElementById('in-noise-hours').value = 9;
+        scrollToId('tool-noise');
+      } else if(sel === 'healthOutbreak'){
+        document.getElementById('in-affected').value = 60;
+        document.getElementById('in-total').value = 200;
+        scrollToId('tool-health');
+      }
+      showTinyToast('Preset loaded', 'success');
+    }
+
+    /************************************************************************
+     * CONTACT & SMALL ACTIONS
+     ************************************************************************/
+    function handleContact(e){
+      e.preventDefault();
+      const name = document.getElementById('contactName').value;
+      const email = document.getElementById('contactEmail').value;
+      const msg = document.getElementById('contactMessage').value;
+      // Demo: just show a message and clear form
+      alert(`Thanks, ${name}! Your message has been recorded (demo).`);
+      document.getElementById('contactForm').reset();
+    }
+    function fillContactDemo(){
+      document.getElementById('contactName').value = 'A. Researcher';
+      document.getElementById('contactEmail').value = 'research@example.org';
+      document.getElementById('contactMessage').value = 'Interested in testing dataset ingestion and map integration.';
+    }
+
+    /************************************************************************
+     * UI INIT & BOOTSTRAP
+     ************************************************************************/
+    function init(){
+      renderHistory();
+      initCharts();
+      // Attach sample fillers for quick use
+      document.querySelectorAll('.tool .btn.secondary').forEach(btn=>{
+        // handled via onclick attributes already
+      });
+      // Update live stats if any
+      updateLiveStats();
+      // Restore theme if user had preference
+      const savedTheme = localStorage.getItem('geo_theme');
+      if(savedTheme) toggleTheme(savedTheme);
+      // Save theme on toggle
+      document.getElementById('themeToggle').addEventListener('click', ()=> localStorage.setItem('geo_theme', document.documentElement.getAttribute('data-theme')));
+    }
+
+    function updateLiveStats(){
+      // set stat elements to latest values or placeholder
+      const latest = appState.history[0];
+      if(latest){
+        if(latest.type === 'AQI'){ document.getElementById('stat-aqi').textContent = parseFloat(latest.value).toFixed(1) }
+        else document.getElementById('stat-aqi').textContent = appState.history.find(h=>h.type==='AQI') ? parseFloat(appState.history.find(h=>h.type==='AQI').value).toFixed(1) : '—';
+
+        document.getElementById('stat-wqi').textContent = appState.history.find(h=>h.type==='WQI') ? parseFloat(appState.history.find(h=>h.type==='WQI').value).toFixed(1) : '—';
+        document.getElementById('stat-noise').textContent = appState.history.find(h=>h.type==='Noise') ? parseFloat(appState.history.find(h=>h.type==='Noise').value).toFixed(1)+' dB' : '—';
+      }else{
+        document.getElementById('stat-aqi').textContent = '—';
+        document.getElementById('stat-wqi').textContent = '—';
+        document.getElementById('stat-noise').textContent = '—';
+      }
+      // live-* elements:
+      const lastAQI = appState.history.find(h => h.type === 'AQI');
+      const lastWQI = appState.history.find(h => h.type === 'WQI');
+      const lastNoise = appState.history.find(h => h.type === 'Noise');
+      document.getElementById('live-aqi').textContent = lastAQI ? parseFloat(lastAQI.value).toFixed(1) : '—';
+      document.getElementById('live-wqi').textContent = lastWQI ? parseFloat(lastWQI.value).toFixed(1) : '—';
+      document.getElementById('live-noise').textContent = lastNoise ? parseFloat(lastNoise.value).toFixed(1)+' dB' : '—';
+    }
+
+    // Download a simple project template (zip not generated here; we'll create a small HTML file)
+    function downloadTemplate(){
+      const template = `
+        <!doctype html><html><head><meta charset="utf-8"><title>Geo-Mining Template</title></head><body><h1>Template</h1><p>Use this folder to begin development (server side + sensors).</p></body></html>
+      `;
+      const blob = new Blob([template], {type:'text/html'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'geo_mining_template.html'; document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    /************************************************************************
+     * INITIALIZE ON LOAD
+     ************************************************************************/
+    window.addEventListener('load', init);
+
+    // Expose some functions to global for onclick usage
+    window.handleCalculateAQI = handleCalculateAQI;
+    window.handleCalculateWQI = handleCalculateWQI;
+    window.handleCalculateNoise = handleCalculateNoise;
+    window.handleCalculateHealth = handleCalculateHealth;
+    window.fillExampleAQI = fillExampleAQI;
+    window.fillExampleWQI = fillExampleWQI;
+    window.fillExampleNoise = fillExampleNoise;
+    window.fillExampleHealth = fillExampleHealth;
+    window.clearHistory = clearHistory;
+    window.exportHistoryCSV = exportHistoryCSV;
+    window.generateReport = generateReport;
+    window.loadSampleData = loadSampleData;
+    window.loadPreset = loadPreset;
+    window.scrollToId = scrollToId;
+    window.toggleHelp = toggleHelp;
+    window.toggleTheme = toggleTheme;
+    window.fillContactDemo = fillContactDemo;
+    window.downloadTemplate = downloadTemplate;
+
+  </script>
+
+  <!-- END -->
+</body>
+</html>

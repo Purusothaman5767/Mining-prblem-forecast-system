@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mining Locations Map</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body{margin:0;padding-top:80px;font-family:Segoe UI,sans-serif}
+
+/* NAVBAR */
+.navbar{
+    position:fixed;top:0;left:0;right:0;
+    background:#172239;height:70px;z-index:1000;
+    display:flex;align-items:center;
+}
+.navbar-container{
+    width:100%;max-width:1200px;margin:auto;
+    display:flex;align-items:center;justify-content:space-between;
+}
+.logo-area{display:flex;align-items:center;gap:12px}
+.site-logo{
+    width:42px;height:42px;border-radius:50%;
+    border:2px ;padding:3px;background:white;
+}
+.logo-title{color:white;font-size:18px;font-weight:600}
+.nav-links{display:flex;gap:30px}
+.nav-link{
+    background:none;border:none;color:white;font-size:15px;
+    opacity:.7;cursor:pointer;
+}
+.nav-link:hover{opacity:1}
+
+/* MAP */
+.map-container{height:550px;border-radius:12px;box-shadow:0 5px 20px rgba(0,0,0,.2)}
+</style>
+</head>
+
+<body>
+
+<nav class="navbar">
+<div class="navbar-container">
+<div class="logo-area">
+<img src="images/logo1.png" class="site-logo">
+<span class="logo-title">Mining Forecast</span>
+</div>
+<div class="nav-links">
+               <button class="nav-link" onclick="location.href='index 1.html'">HOME</button>
+
+                <button class="nav-link" data-page="contact" onclick="navigateTo('contact')">CONTACT</button>
+                <button class="nav-link" data-page="about" onclick="navigateTo('about')">ABOUT US</button>
+               <button class="nav-link" onclick="location.href='mining 2.html'">CALCULATIONS</button>
+<button class="nav-link" onclick="location.href='map3.html'">MAP</button>
+
+            
+            </div>
+</div>
+</nav>
+
+<div class="container">
+<h2 class="text-center mb-3">Mining Locations Map</h2>
+<p class="text-center text-muted">Hover over a marker to view mining site details</p>
+<div id="map" class="map-container"></div>
+</div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB-0yw_DYro7vy-Y2D2czYEDtuFsxMEfZw&callback=initMap" async defer></script>
+
+<script>
+function initMap(){
+const map=new google.maps.Map(document.getElementById("map"),{
+center:{lat:20.5937,lng:78.9629},
+zoom:5,mapTypeId:"hybrid"
+});
+
+const miningIcon={
+url:"images/logo.png",
+scaledSize:new google.maps.Size(40,40),
+anchor:new google.maps.Point(20,20)
+};
+
+const mines=[
+{pos:{lat:12.9716,lng:77.5946},name:"Kolar Gold Fields",mineral:"Gold",depth:"500m",status:"Active"},
+{pos:{lat:22.5726,lng:88.3639},name:"Raniganj Coal Mine",mineral:"Coal",depth:"300m",status:"Operational"},
+{pos:{lat:19.076,lng:72.8777},name:"Ratnagiri Iron Mine",mineral:"Iron",depth:"450m",status:"Exploration"},
+{pos:{lat:15.3173,lng:75.7139},name:"Khetri Copper Mine",mineral:"Copper",depth:"350m",status:"Active"}
+];
+
+mines.forEach(m=>{
+const marker=new google.maps.Marker({position:m.pos,map,icon:miningIcon});
+const info=new google.maps.InfoWindow({
+content:`<b>${m.name}</b><br>Mineral: ${m.mineral}<br>Depth: ${m.depth}<br>Status: ${m.status}`
+});
+marker.addListener("mouseover",()=>info.open(map,marker));
+marker.addListener("mouseout",()=>info.close());
+});
+}
+</script>
+</body>
+</html>
